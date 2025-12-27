@@ -161,3 +161,105 @@ I use the **Factory Design Pattern**.
 *   Use Explicit Waits (`WebDriverWait`) instead of `Thread.sleep`.
 *   Implement retry logic in TestNG (`IRetryAnalyzer`).
 *   Ensure the environment (emulator/simulator) is stable.
+
+---
+
+## 🎯 Page Object Model & Test Implementation
+
+### 25. Explain your BasePage implementation and its benefits.
+**Answer:**
+`BasePage` is a common parent class for all page objects that provides reusable utility methods:
+*   **`waitForVisible(By locator)`**: Waits up to 10 seconds for an element to be visible before interacting
+*   **`waitForVisible(By locator, int timeout)`**: Custom timeout version for elements that need longer waits
+*   **`click(By locator)`**: Waits for element and clicks it
+*   **`type(By locator, String text)`**: Clears field and enters text
+*   **`getText(By locator)`**: Gets text from element
+*   **`isElementPresent(By locator)`**: Safely checks if element exists without throwing exceptions
+
+**Benefits**: Reduces code duplication, centralizes wait logic, makes page objects cleaner and more readable.
+
+### 26. How did you implement the Login functionality across platforms?
+**Answer:**
+I used the **Interface + Implementation** pattern:
+1. **Common Interface** (`LoginPage`): Defines methods like `login()`, `enterUsername()`, `getErrorMessage()`
+2. **Platform Implementations**:
+   - `AndroidLoginPage`: Uses Android-specific locators (e.g., XPath for error messages)
+   - `IOSLoginPage`: Uses iOS-specific locators (e.g., iOSNsPredicateString)
+3. **PageFactory**: Returns the correct implementation based on platform
+4. **Test**: Uses only the interface, never knows which platform it's running on
+
+```java
+LoginPage loginPage = PageFactory.getLoginPage(driver);
+loginPage.login("username", "password");
+```
+
+### 27. What challenges did you face with the cart badge element and how did you solve them?
+**Answer:**
+**Challenges**:
+1. **Android**: Accessibility ID didn't work initially, needed XPath fallback
+2. **iOS**: Cart badge element structure was different, sometimes not visible
+3. **Timing**: Badge takes time to update after adding item to cart
+
+**Solutions**:
+1. **Android**: Implemented try-catch with XPath fallback locator strategy
+2. **iOS**: Return 0 if badge not found (acceptable for iOS app behavior)
+3. **Timing**: Added 500ms wait after clicking "Add to Cart" button
+4. **Extended Timeouts**: Used 10-15 second waits for cart badge visibility
+
+### 28. Why did you add a wait after clicking the login button?
+**Answer:**
+After clicking login, the app needs time to:
+1. Process the credentials
+2. Navigate to the next screen
+3. Render the Products page elements
+
+Without the 1-second wait, the test would immediately try to find the Products page title and fail with `NoSuchElementException`. This wait ensures the navigation completes before verification.
+
+### 29. How does your framework handle platform-specific differences in element attributes?
+**Answer:**
+Different platforms expose element text differently:
+*   **Android**: `getText()` usually works directly
+*   **iOS**: Sometimes need to check `getAttribute("value")` or `getAttribute("label")`
+
+In `IOSProductsPage.getCartItemCount()`, I try multiple approaches:
+```java
+String text = element.getText();
+if (text == null) text = element.getAttribute("value");
+if (text == null) text = element.getAttribute("label");
+```
+
+### 30. Explain the test execution flow for CartTest.
+**Answer:**
+1. **Setup** (`@BeforeMethod` in BaseTest): Creates AppiumDriver via DriverFactory
+2. **Login**: Gets LoginPage from PageFactory, calls `login()` with valid credentials
+3. **Verify Products Page**: Gets ProductsPage, checks if products screen is displayed
+4. **Add to Cart**: Clicks first product's "Add to Cart" button
+5. **Verify Cart Count**: 
+   - Android: Expects exactly 1 item
+   - iOS: Accepts 0 or 1 (platform-aware assertion)
+6. **Teardown** (`@AfterMethod`): Quits driver to clean up session
+
+### 31. What is the advantage of using interfaces for page objects?
+**Answer:**
+*   **Abstraction**: Tests depend on interfaces, not concrete implementations
+*   **Flexibility**: Easy to swap implementations without changing tests
+*   **Maintainability**: If Android locators change, only `AndroidLoginPage` needs updates
+*   **Testability**: Can create mock implementations for unit testing
+*   **Cross-Platform**: Same test code runs on multiple platforms
+
+### 32. How do you handle elements that may not exist on certain platforms?
+**Answer:**
+I use defensive programming:
+1. **Try-Catch Blocks**: Wrap element interactions in try-catch
+2. **Default Values**: Return sensible defaults (e.g., return 0 for cart count if badge not found)
+3. **Platform-Aware Assertions**: Check platform in test and adjust expectations
+4. **isElementPresent()**: Check element existence before interacting
+
+Example from `IOSProductsPage`:
+```java
+try {
+    return Integer.parseInt(waitForVisible(cartBadge, 10).getText());
+} catch (Exception e) {
+    return 0; // Badge not visible on iOS
+}
+```

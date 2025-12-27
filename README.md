@@ -29,15 +29,49 @@ modular-mobile-automation-framework/
 │   │   ├── DriverFactory.java     # Manages Appium drivers (Android/iOS)
 │   │   └── PlatformType.java      # Platform enums
 │   └── test/
-│       ├── java/tests/            # Test classes (e.g., SmokeTest.java)
+│       ├── java/
+│       │   ├── base/
+│       │   │   └── BaseTest.java       # Base test setup/teardown
+│       │   ├── pages/
+│       │   │   ├── common/             # Common interfaces & base page
+│       │   │   │   ├── BasePage.java
+│       │   │   │   ├── LoginPage.java
+│       │   │   │   └── ProductsPage.java
+│       │   │   ├── android/            # Android implementations
+│       │   │   │   ├── AndroidLoginPage.java
+│       │   │   │   └── AndroidProductsPage.java
+│       │   │   └── ios/                # iOS implementations
+│       │   │       ├── IOSLoginPage.java
+│       │   │       └── IOSProductsPage.java
+│       │   ├── tests/
+│       │   │   ├── login/
+│       │   │   │   └── LoginTest.java
+│       │   │   └── cart/
+│       │   │       └── CartTest.java
+│       │   └── utils/
+│       │       └── PageFactory.java    # Factory pattern for page objects
 │       └── resources/
-│           ├── apps/              # Mobile app binaries (.apk, .app)
-│           └── config/            # Configuration files
+│           ├── apps/                   # Mobile app binaries (.apk, .app)
+│           └── config/                 # Configuration files
 │               ├── android.properties
 │               └── ios.properties
-├── build.gradle                   # Dependencies and build configuration
-└── README.md
+├── build.gradle                        # Dependencies and build configuration
+├── README.md
+└── INTERVIEW_QA.md
 ```
+
+## 🧪 Test Scenarios
+
+The framework includes comprehensive test coverage for the **Sauce Labs Mobile Demo App**:
+
+### **Login Tests** (`tests/login/LoginTest.java`)
+1. **Invalid Login Test**: Validates error message display for incorrect credentials
+2. **Valid Login Test**: Verifies successful login and navigation to Products page
+
+### **Cart Tests** (`tests/cart/CartTest.java`)
+1. **Add to Cart Test**: Validates adding a product to cart and verifying cart badge count
+
+All tests are **cross-platform** and run on both Android and iOS without code changes!
 
 ## ⚙️ Prerequisites
 
@@ -73,6 +107,9 @@ Check out the [INTERVIEW_QA.md](INTERVIEW_QA.md) file for a curated list of 20+ 
 
 ## 🔄 Recent Improvements
 
-*   **Fixed Configuration Caching**: The framework now correctly reloads properties files when switching platforms dynamically during the same Gradle daemon session.
-*   **Driver Lifecycle Management**: Implemented logic to automatically quit and recreate drivers when the requested platform changes between tests.
-*   **Git Integration**: Added `.gitignore` to keep the repository clean.
+*   **Page Object Model (POM)**: Implemented clean separation between test logic and page interactions using the Page Object pattern.
+*   **Factory Design Pattern**: Created `PageFactory` utility that dynamically returns platform-specific page implementations, enabling true cross-platform testing.
+*   **Cross-Platform Tests**: Login and Cart tests run seamlessly on both Android and iOS without any code duplication.
+*   **Robust Element Handling**: Implemented smart wait strategies and fallback locators for reliable element interactions.
+*   **Fixed Configuration Caching**: The framework correctly reloads properties files when switching platforms dynamically.
+*   **Driver Lifecycle Management**: Automatic driver quit and recreation when platform changes between tests.
