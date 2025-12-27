@@ -6,6 +6,7 @@ A robust, scalable, and modular automation framework designed for testing **Andr
 
 *   **Cross-Platform Support**: Write tests once and run them on both Android and iOS devices.
 *   **Dynamic Configuration**: Automatically loads the correct environment configuration (`android.properties` or `ios.properties`) based on the runtime platform.
+*   **Cross-Platform Page Objects**: Uses the **Factory Design Pattern** via `PageFactory` to dynamically serve Android or iOS page implementations, allowing a single test script to run on both platforms.
 *   **Smart Driver Management**: Intelligent driver factory that handles driver creation and automatic switching between platforms (e.g., stopping an iOS session before starting an Android test) without manual intervention.
 *   **Modular Architecture**: Separation of concerns with distinct layers for Configuration, Drivers, and Tests.
 *   **Gradle Integration**: Easy-to-run tests via command-line arguments.

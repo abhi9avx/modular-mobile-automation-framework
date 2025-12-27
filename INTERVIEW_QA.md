@@ -148,7 +148,15 @@ Yes, TestNG supports parallel execution. We would need to:
 **Answer:**
 A design pattern where each screen of the app is a separate Java class. The test script calls methods on these page classes interacting with the web elements. It reduces code duplication. (We can implement this next!).
 
-### 22. How would you handle flaky tests?
+### 23. How do you design tests to run on both Android and iOS without code duplication?
+**Answer:**
+I use the **Factory Design Pattern**.
+*   I create a common interface (e.g., `LoginPage`) that defines the actions (like `login()`).
+*   I implement this interface twice: `AndroidLoginPage` (with Android locators) and `IOSLoginPage` (with iOS locators).
+*   I use a `PageFactory` utility class. The test asks the factory for a `LoginPage`, and the factory checks the configuration (`platformName`) to return the correct object.
+*   The test itself never uses `new AndroidLoginPage()`; it relies entirely on the interface.
+
+### 24. How would you handle flaky tests?
 **Answer:**
 *   Use Explicit Waits (`WebDriverWait`) instead of `Thread.sleep`.
 *   Implement retry logic in TestNG (`IRetryAnalyzer`).
