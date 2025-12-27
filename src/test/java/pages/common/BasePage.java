@@ -40,4 +40,19 @@ public class BasePage {
     protected String getText(By locator) {
         return waitForVisible(locator).getText();
     }
+
+    // Check if element exists (without throwing exception)
+    protected boolean isElementPresent(By locator) {
+        try {
+            return !driver.findElements(locator).isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Wait for element with custom timeout
+    protected WebElement waitForVisible(By locator, int timeoutSeconds) {
+        WebDriverWait customWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+        return customWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
 }

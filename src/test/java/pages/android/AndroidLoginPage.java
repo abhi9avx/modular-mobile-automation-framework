@@ -51,10 +51,18 @@ public class AndroidLoginPage extends BasePage implements LoginPage {
             // Ignore if keyboard is already hidden or not supported
         }
         click(loginButton);
+
+        // Wait for navigation to complete after login
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
     public String getErrorMessage() {
-        return getText(errorMessage);
+        // Use longer timeout as error message may take time to appear
+        return waitForVisible(errorMessage, 15).getText();
     }
 }
