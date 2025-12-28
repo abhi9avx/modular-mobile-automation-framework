@@ -37,13 +37,19 @@ jobs:
       - name: Run Android Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
+          api-level: 29
           target: google_apis
           arch: x86_64
           profile: pixel_6
           script: |
+            # Start Appium in background
             appium --log-level debug &
-            sleep 15
+            
+            # Wait for Appium to be ready (Dynamic check)
+            echo "Waiting for Appium to start..."
+            timeout 60s bash -c 'until curl -s http://localhost:4723/status; do sleep 2; done'
+            echo "Appium is UP and running!"
+            
             ./gradlew clean test -Dplatform=android
 
       - name: Generate Allure Report
