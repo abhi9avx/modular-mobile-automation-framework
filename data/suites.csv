@@ -1,0 +1,4 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Sun Dec 28 17:21:52 UTC 2025","Sun Dec 28 17:21:58 UTC 2025","6186","Gradle suite","Gradle test","tests.login.LoginTest","tests.login.LoginTest","shouldLoginSuccessfullyWithValidCredentials","shouldLoginSuccessfullyWithValidCredentials",""
+"passed","Sun Dec 28 17:21:39 UTC 2025","Sun Dec 28 17:21:45 UTC 2025","5767","Gradle suite","Gradle test","tests.login.LoginTest","tests.login.LoginTest","shouldShowErrorForInvalidLogin","shouldShowErrorForInvalidLogin",""
+"passed","Sun Dec 28 17:21:09 UTC 2025","Sun Dec 28 17:21:31 UTC 2025","22173","Gradle suite","Gradle test","tests.cart.CartTest","tests.cart.CartTest","shouldLoginAndAddProductToCart","shouldLoginAndAddProductToCart",""
