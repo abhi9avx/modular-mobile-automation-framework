@@ -151,23 +151,6 @@ Generate and open the interactive Allure report:
 
 ---
 
-## 🐳 Dockerized Execution (Premium Infrastructure)
-
-For a professional, isolated execution environment, this framework supports a **Multi-Service Docker Architecture**. Use this to run tests without installing Android SDKs or Emulators on your local host.
-
-### **1. How it works**
-The `docker-compose.yml` orchestrates two linked services:
-1.  **`android-device`**: A container running an Android Emulator and an Appium server.
-2.  **`mobile-tests`**: Your test engine container that connects to the emulator via the internal Docker network.
-
-### **2. Watch Live in Browser (Stunning Feature)**
-One of the most powerful features of this setup is the **integrated VNC Viewer**.
-1.  Run the infrastructure: `docker-compose up --build`
-2.  Open your browser to: **`http://localhost:6080`**
-3.  **WOW Factor**: You can watch the Android device screen and interact with it live directly in your web browser!
-
-### **3. Persistence**
-All results, videos, and logs are mapped from the container back to your local `build/` folder using **Docker Volumes**, ensuring data is not lost when containers shut down.
 
 ---
 

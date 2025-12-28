@@ -42,25 +42,15 @@ public class ConfigProvider {
   }
 
   public static String get(String key, String defaultValue) {
-    // 1️⃣ Priority: Check System Properties (e.g., -DappiumServerUrl=...)
-    String value = System.getProperty(key);
-    if (value != null && !value.trim().isEmpty()) {
-      return value;
+    String platform = System.getProperty("platform");
+    if (platform == null || platform.trim().isEmpty()) {
+      platform = "android";
     }
+    String currentPlatform = platform.toLowerCase();
 
-    // 2️⃣ Priority: Check Environment Variables (e.g., Docker environment)
-    value = System.getenv(key);
-    if (value != null && !value.trim().isEmpty()) {
-      return value;
-    }
-
-    // 3️⃣ Priority: File-based config (android.properties / ios.properties)
-    String platform = System.getProperty("platform", "android").toLowerCase();
-
-    if (config == null || !platform.equals(loadedPlatform)) {
+    if (config == null || !currentPlatform.equals(loadedPlatform)) {
       loadConfig();
     }
-
     return config.getProperty(key, defaultValue);
   }
 }
