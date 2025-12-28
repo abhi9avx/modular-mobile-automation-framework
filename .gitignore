@@ -30,3 +30,6 @@ appium.log
 # Temporary files
 tmp/
 *.tmp
+
+# VS Code
+.vscode/

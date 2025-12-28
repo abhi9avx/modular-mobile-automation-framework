@@ -11,23 +11,23 @@ import pages.ios.IOSProductsPage;
 
 public class PageFactory {
 
-    public static LoginPage getLoginPage(AppiumDriver driver) {
-        String platform = ConfigProvider.get("platformName");
+  public static LoginPage getLoginPage(AppiumDriver driver) {
+    String platform = ConfigProvider.get("platformName");
 
-        if ("Android".equalsIgnoreCase(platform)) {
-            return new AndroidLoginPage(driver);
-        } else {
-            return new IOSLoginPage(driver);
-        }
+    if ("Android".equalsIgnoreCase(platform)) {
+      return new AndroidLoginPage(driver);
+    } else {
+      return new IOSLoginPage(driver);
     }
+  }
 
-    public static ProductsPage getProductsPage(AppiumDriver driver) {
-        String platform = ConfigProvider.get("platformName");
+  public static ProductsPage getProductsPage(AppiumDriver driver) {
+    String platform = ConfigProvider.get("platformName");
 
-        if ("Android".equalsIgnoreCase(platform)) {
-            return new AndroidProductsPage(driver);
-        } else {
-            return new IOSProductsPage(driver);
-        }
+    if ("Android".equalsIgnoreCase(platform)) {
+      return new AndroidProductsPage(driver);
+    } else {
+      return new IOSProductsPage(driver);
     }
+  }
 }

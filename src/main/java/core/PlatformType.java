@@ -1,6 +1,6 @@
 package core;
 
 public enum PlatformType {
-    ANDROID,
-    IOS
+  ANDROID,
+  IOS
 }

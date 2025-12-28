@@ -8,51 +8,52 @@ import pages.common.LoginPage;
 
 public class IOSLoginPage extends BasePage implements LoginPage {
 
-    // ===== Locators (iOS) =====
-    // The Sauce Labs Sample App uses the same Accessibility IDs for iOS
-    private final By usernameField = AppiumBy.accessibilityId("test-Username");
-    private final By passwordField = AppiumBy.accessibilityId("test-Password");
-    private final By loginButton = AppiumBy.accessibilityId("test-LOGIN");
-    // Use iOS Predicate String to find the element containing the error text
-    private final By errorMessage = AppiumBy.iOSNsPredicateString(
-            "name CONTAINS 'do not match' OR label CONTAINS 'do not match' OR value CONTAINS 'do not match'");
+  // ===== Locators (iOS) =====
+  // The Sauce Labs Sample App uses the same Accessibility IDs for iOS
+  private final By usernameField = AppiumBy.accessibilityId("test-Username");
+  private final By passwordField = AppiumBy.accessibilityId("test-Password");
+  private final By loginButton = AppiumBy.accessibilityId("test-LOGIN");
+  // Use iOS Predicate String to find the element containing the error text
+  private final By errorMessage =
+      AppiumBy.iOSNsPredicateString(
+          "name CONTAINS 'do not match' OR label CONTAINS 'do not match' OR value CONTAINS 'do not match'");
 
-    public IOSLoginPage(AppiumDriver driver) {
-        super(driver);
+  public IOSLoginPage(AppiumDriver driver) {
+    super(driver);
+  }
+
+  @Override
+  public void login(String username, String password) {
+    enterUsername(username);
+    enterPassword(password);
+    tapLogin();
+  }
+
+  @Override
+  public void enterUsername(String username) {
+    type(usernameField, username);
+  }
+
+  @Override
+  public void enterPassword(String password) {
+    type(passwordField, password);
+  }
+
+  @Override
+  public void tapLogin() {
+    click(loginButton);
+
+    // Wait for navigation to complete after login
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
+  }
 
-    @Override
-    public void login(String username, String password) {
-        enterUsername(username);
-        enterPassword(password);
-        tapLogin();
-    }
-
-    @Override
-    public void enterUsername(String username) {
-        type(usernameField, username);
-    }
-
-    @Override
-    public void enterPassword(String password) {
-        type(passwordField, password);
-    }
-
-    @Override
-    public void tapLogin() {
-        click(loginButton);
-
-        // Wait for navigation to complete after login
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    @Override
-    public String getErrorMessage() {
-        // Use longer timeout as error message may take time to appear
-        return waitForVisible(errorMessage, 15).getText();
-    }
+  @Override
+  public String getErrorMessage() {
+    // Use longer timeout as error message may take time to appear
+    return waitForVisible(errorMessage, 15).getText();
+  }
 }

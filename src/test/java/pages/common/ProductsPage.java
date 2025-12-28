@@ -2,12 +2,12 @@ package pages.common;
 
 public interface ProductsPage {
 
-    // Verify products page is visible
-    boolean isProductsPageDisplayed();
+  // Verify products page is visible
+  boolean isProductsPageDisplayed();
 
-    // Add first product to cart
-    void addFirstProductToCart();
+  // Add first product to cart
+  void addFirstProductToCart();
 
-    // Get cart badge count
-    int getCartItemCount();
+  // Get cart badge count
+  int getCartItemCount();
 }
