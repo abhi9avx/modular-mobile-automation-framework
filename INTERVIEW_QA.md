@@ -250,10 +250,10 @@ if (text == null) text = element.getAttribute("label");
 ### 32. How do you handle elements that may not exist on certain platforms?
 **Answer:**
 I use defensive programming:
-1. **Try-Catch Blocks**: Wrap element interactions in try-catch
-2. **Default Values**: Return sensible defaults (e.g., return 0 for cart count if badge not found)
-3. **Platform-Aware Assertions**: Check platform in test and adjust expectations
-4. **isElementPresent()**: Check element existence before interacting
+1. **Try-Catch Blocks**: Wrap element interactions in try-catch.
+2. **Default Values**: Return sensible defaults (e.g., return 0 for cart count if badge not found).
+3. **Platform-Aware Assertions**: Check platform in test and adjust expectations.
+4. **isElementPresent()**: Check element existence before interacting.
 
 Example from `IOSProductsPage`:
 ```java
@@ -263,3 +263,88 @@ try {
     return 0; // Badge not visible on iOS
 }
 ```
+
+---
+
+## 📊 Advanced Reporting & Observability
+
+### 33. Why did you integrate Allure Reporting instead of standard TestNG reports?
+**Answer:**
+Allure offers a much richer, interactive, and stakeholder-friendly reporting experience:
+*   **Visual Assets**: It natively supports embedding screenshots and videos.
+*   **Step Discovery**: Using the `@Step` annotation, we can see exactly which line of code was executing when a failure occurred.
+*   **Environment Info**: It captures browser/mobile versions and platform details.
+*   **Timeline View**: Useful for analyzing performance and execution order.
+*   **Categorization**: It separates "Failed" (Product Bug) from "Broken" (Environment/Test Bug).
+
+### 34. How did you implement automatic screen recording for iOS and Android?
+**Answer:**
+1.  I used Appium's `CanRecordScreen` interface.
+2.  **Selection**: In `@BeforeMethod`, I call `startRecordingScreen()`.
+3.  **Options**: For iOS, I used `IOSStartScreenRecordingOptions` with `videoType("h264")` to ensure browser compatibility. 
+4.  **Attachment**: In `@AfterMethod`, I call `stopRecordingScreen()`, decode the resulting Base64 string into a byte array, and use Allure's `@Attachment` to embed it in the report.
+
+### 35. What is the role of FFmpeg in your framework?
+**Answer:**
+FFmpeg is a mandatory external dependency for Appium when recording screen video on iOS simulators and real devices. It handles the encoding of individual frames into a video file (like MP4). Without it, the `startRecordingScreen` command throws an error.
+
+### 36. How do you handle the case where a dependency like FFmpeg is missing?
+**Answer:**
+I implemented **Defensive Architecture**. I wrapped the recording logic in `try-catch` blocks. If FFmpeg is missing or the device doesn't support recording, the framework logs a warning but **allows the test to proceed**. This prevents environmental minor issues from failing the entire test suite.
+
+### 37. How did you integrate Log4j2 and why is it attached to Allure?
+**Answer:**
+1.  **Log4j2 Configuration**: I created a `log4j2.xml` file that routes logs to both the Console and a file (`build/logs/app.log`).
+2.  **Centralized Logging**: Every test action (Login, Add to Cart) logs its progress via a Logger instance.
+3.  **Allure Attachment**: In the `@AfterMethod` (Teardown), the framework reads the `app.log` file using `Files.readAllBytes()` and attaches it to the report using `@Attachment(type = "text/plain")`. This gives us a complete "Execution Audit Trail" for every single test.
+
+### 38. What is the difference between "Failed" and "Broken" in Allure reports?
+**Answer:**
+*   **Failed (Red)**: An assertion failed. This means the app is likely buggy (e.g., expected "Welcome", but got "Error").
+*   **Broken (Yellow)**: A "Test Defect". This means the test couldn't even finish because of a setup issue (e.g., Appium server down, file not found, or `ffmpeg` missing). This distinction helps developers prioritize fixing the app vs. fixing the test environment.
+
+### 39. How do you ensure your Allure reports are always clean and fresh?
+**Answer:**
+I updated the `build.gradle` file's `test` task with a `doFirst` block:
+```gradle
+test {
+    doFirst {
+        delete fileTree("build/allure-results")
+    }
+}
+```
+This ensures that every time `./gradlew test` is run, the old "ghost" results from previous runs are deleted, providing an accurate representation of the current code state.
+
+---
+
+## 🚀 Advanced Framework Architecture
+
+### 40. Explain the use of the `BaseTest` class.
+**Answer:**
+`BaseTest` acts as the orchestrator for the test lifecycle. It handles:
+*   **Initialization**: Calls `DriverFactory` to get the driver.
+*   **Observability**: Starts screen recording and initializes the Logger.
+*   **Teardown**: Captures screenshots on failure, saves the recording, attaches logs, and finally quits the driver.
+By centralizing this, the actual test classes (like `LoginTest`) stay focused only on business logic.
+
+### 41. How would you handle Parallel Execution in this framework?
+**Answer:**
+Currently, `DriverFactory` uses a static variable for the driver. To support parallel execution, I would:
+1.  Change the driver storage to `ThreadLocal<AppiumDriver>`.
+2.  This ensures each thread (test) has its own isolated driver instance.
+3.  Update the TestNG configuration to allow parallel execution of classes or methods.
+
+### 42. What Gradle versions are you using and why?
+**Answer:**
+I am using **Gradle 9+**. This required updating the Allure Gradle plugin to version **3.0.1** and the Allure dependency to **2.29.0** to ensure compatibility with Gradle's latest configuration cache and security standards.
+
+### 43. How do you handle element locators for different platforms?
+**Answer:**
+I follow the "Separation of Concerns" principle.
+*   **Common Interface**: `LoginPage.java` defines the *what* (e.g., `enterUsername`).
+*   **Platform Implementation**: `AndroidLoginPage` and `IOSLoginPage` define the *how* (locators). 
+For Android, I use `id` or `xpath`. For iOS, I prefer `accessibility-id` or `iOS Class Chain` for better performance.
+
+### 44. What is the "Page Factory" pattern you implemented?
+**Answer:**
+It's a custom utility (`utils/PageFactory.java`) that acts as a Creator. In the test, instead of doing `new AndroidLoginPage()`, I call `PageFactory.getLoginPage(driver)`. The factory checks the runtime platform and returns the correct implementation. This makes the test code 100% platform-independent.
