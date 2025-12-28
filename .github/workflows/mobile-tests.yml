@@ -69,10 +69,10 @@ jobs:
             chmod +x gradlew
             ./gradlew clean test -Dplatform=android || echo "Tests failed but continuing to report..."
             
-            # 🚨 Kill Appium using pkill (more reliable than PID tracking)
+            # 🚨 Kill Appium (safely)
             echo "Stopping Appium server..."
-            pkill -f appium || true
-            sleep 5
+            pkill -x appium || true
+            sleep 2
 
       # 5️⃣ Generate Allure Report
       - name: Generate Allure Report
