@@ -348,3 +348,37 @@ For Android, I use `id` or `xpath`. For iOS, I prefer `accessibility-id` or `iOS
 ### 44. What is the "Page Factory" pattern you implemented?
 **Answer:**
 It's a custom utility (`utils/PageFactory.java`) that acts as a Creator. In the test, instead of doing `new AndroidLoginPage()`, I call `PageFactory.getLoginPage(driver)`. The factory checks the runtime platform and returns the correct implementation. This makes the test code 100% platform-independent.
+
+---
+
+## 🤖 CI/CD & Cloud Automation
+
+### 45. How do you run mobile tests in a CI environment like GitHub Actions?
+**Answer:**
+Running mobile tests in CI is challenging because you need a real device or emulator.
+1.  **Environment**: We use `ubuntu-latest` as the runner.
+2.  **Appium Setup**: Since runners are clean, we must install Node.js, Appium 2.0, and the `uiautomator2` driver via command line in the YAML workflow.
+3.  **Emulator**: We use the `reactivecircus/android-emulator-runner` action. This is the gold standard because it handles setting up KVM (Hardware Acceleration) on the Linux runner so the emulator runs fast enough for automation.
+
+### 46. Why is `if: always()` better than `continue-on-error: true` for reporting?
+**Answer:**
+*   **`continue-on-error: true`**: Makes the "Run Tests" step appear **Green** even if tests failed. This is dangerous because you might miss a legitimate failure.
+*   **`if: always()`**: Keeps the "Run Tests" step **Red** (correctly indicating a failure), but ensures the "Generate Report" step still runs. This is the preferred way to ensure we get our Allure artifacts while still accurately representing the build status.
+
+### 47. How do you handle the Appium Server in CI?
+**Answer:**
+I start the Appium server in the background using the `&` operator (e.g., `appium &`). This allows the server to stay alive while the next steps (running the tests) execute. I also add a small wait or check the logs to ensure the server is fully "Ready" before the tests start.
+
+### 48. What are the limitations of running iOS tests on standard GitHub Runners?
+**Answer:**
+Standard GitHub `ubuntu-latest` runners cannot run iOS tests because they require macOS and Xcode. To run iOS tests in CI, you must:
+1.  Use a **macOS runner** (`runs-on: macos-latest`), which is more expensive and slower.
+2.  Use a cloud provider like **BrowserStack** or **Sauce Labs** to host the devices, while running the test logic on a standard Linux runner.
+
+### 49. How do you deploy Allure reports in CI?
+**Answer:**
+I use the `peaceiris/actions-gh-pages` action. Once the `allureReport` task generates the static HTML in `build/reports/allure-report`, this action pushes that folder to a special `gh-pages` branch. GitHub then automatically hosts it, providing a public URL where the team can view the results.
+
+### 50. What is "Self-Healing" in the context of Page Objects?
+**Answer:**
+Self-healing is an advanced concept where if a locator fails, the framework tries alternative locators (e.g., if ID fails, try XPath). In our framework, we have a "Semi-Self-Healing" approach in `AndroidProductsPage` where we use a `try-catch` to attempt an accessibility ID first, and if that fails, we fallback to a more robust XPath.

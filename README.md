@@ -152,6 +152,19 @@ Generate and open the interactive Allure report:
 
 ---
 
+## 🤖 CI/CD Integration (GitHub Actions)
+
+The framework is fully integrated with **GitHub Actions** for Continuous Integration.
+
+### **Pipeline Workflow (`mobile-tests.yml`):**
+1.  **Environment Setup**: Installs Java 17, Node.js, and Appium 2.x.
+2.  **Appium Infrastructure**: Automatically installs the `uiautomator2` driver and starts the server.
+3.  **Android Emulator Runner**: Uses hardware-accelerated cloud emulators to run tests without requiring local devices.
+4.  **Resilient Execution**: Uses `if: always()` logic to ensure that an **Allure Report** is always generated and uploaded, even if tests fail.
+5.  **GitHub Pages Deployment**: Automatically hosts the latest report so the whole team can view test results via a URL.
+
+---
+
 ## 🎓 SDET Interview Masterclass
 
 Building the framework is only half the battle. Explaining it is the other half. 

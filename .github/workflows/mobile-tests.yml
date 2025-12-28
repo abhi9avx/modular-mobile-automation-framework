@@ -1,0 +1,65 @@
+name: Mobile Automation CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mobile-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Appium & Drivers
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+
+      - name: Run Android Tests on Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          target: google_apis
+          arch: x86
+          profile: pixel_6
+          script: |
+            appium --log-level debug &
+            sleep 15
+            ./gradlew clean test -Dplatform=android
+
+      - name: Generate Allure Report
+        if: always()
+        run: ./gradlew allureReport
+
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: build/reports/allure-report
+
+      - name: Deploy Allure to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/reports/allure-report
