@@ -176,8 +176,6 @@ All sensitive data (Telegram Tokens, Chat IDs) are managed via **GitHub Reposito
 Building the framework is only half the battle. Explaining it is the other half. 
 We have documented **45+ Senior SDET interview questions** and detailed answers based on this exact framework. It covers everything from **Appium Architecture** to **Advanced Observability**.
 
-👉 **[Launch the Interview Q&A Guide](INTERVIEW_QA.md)** 👈
-
 ---
 
 ## 📈 Recent Major Updates
