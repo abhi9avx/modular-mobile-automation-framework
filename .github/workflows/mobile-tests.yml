@@ -59,7 +59,6 @@ jobs:
           script: |
             # Start Appium in background
             appium --log-level debug > appium.log 2>&1 &
-            APPIUM_PID=$!
             
             # Wait for Appium to be ready
             echo "Waiting for Appium to start..."
@@ -70,9 +69,9 @@ jobs:
             chmod +x gradlew
             ./gradlew clean test -Dplatform=android || echo "Tests failed but continuing to report..."
             
-            # 🚨 Kill Appium explicitly to prevent job hang
-            echo "Killing Appium (PID: $APPIUM_PID)..."
-            kill $APPIUM_PID || true
+            # 🚨 Kill Appium using pkill (more reliable than PID tracking)
+            echo "Stopping Appium server..."
+            pkill -f appium || true
             sleep 5
 
       # 5️⃣ Generate Allure Report
@@ -108,16 +107,23 @@ jobs:
       # 9️⃣ Send Telegram Notification
       - name: Send Telegram Notification
         if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          URL="https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "🚨 Telegram secrets are missing! Skipping notification."
+            exit 0
+          fi
+
           TEXT="🚀 *Mobile Test Execution Completed!*
           
           ✅ *Result:* ${{ job.status }}
           🌍 *Report:* [Click here to view](https://abhi9avx.github.io/modular-mobile-automation-framework/)
           
           🛠 *Platform:* Android (API 28)"
-          
-          curl -s -X POST "$URL" \
-            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
             -d text="$TEXT" \
             -d parse_mode="Markdown"
