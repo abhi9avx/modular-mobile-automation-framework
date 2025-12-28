@@ -42,6 +42,7 @@ By integrating **Allure Reporting**, **Log4j2**, and **FFmpeg**, this framework 
 | 📊 | **Allure 3.0.1** | Premium, interactive visual reporting. |
 | 📝 | **Log4j2** | Enterprise-grade structured logging. |
 | 🐘 | **Gradle 9+** | High-speed build and dependency management. |
+| 🤖 | **GitHub Actions** | CI/CD Pipeline with Telegram Notifications & Reporting. |
 
 ---
 
@@ -118,8 +119,7 @@ A clean, modular structure designed for clarity:
 │   ├── 📂 apps                      # 📦 Mobile binaries (.apk, .app)
 │   ├── 📂 config                    # ⚙️ Appium Capabilities
 │   └── 📄 log4j2.xml                # 📝 Log routing configuration
-├── 📄 build.gradle                  # 🛠️ Dependencies & Allure config
-└── 📄 INTERVIEW_QA.md               # 🎓 The Interview Masterclass
+└── 📄 build.gradle                  # 🛠️ Dependencies & Allure config
 ```
 
 ---
@@ -166,17 +166,15 @@ This framework isn't just code—it's a production-ready **CI/CD Pipeline**.
     *   **Build Status** (Success/Failure)
     *   **Clickable Report Link** for instant troubleshooting.
 
-### **Security First**
-All sensitive data (Telegram Tokens, Chat IDs) are managed via **GitHub Repository Secrets** and mapped to the environment at runtime, ensuring complete security.
+### **Security & Configuration**
+All sensitive data is managed via **GitHub Repository Secrets**, ensuring no tokens are exposed in the codebase:
+*   `TELEGRAM_BOT_TOKEN`: The API token for the notification bot.
+*   `TELEGRAM_CHAT_ID`: The recipient ID for build alerts.
+These are injected securely into the workflow at runtime.
 
 ---
 
-## 🎓 SDET Interview Masterclass
 
-Building the framework is only half the battle. Explaining it is the other half. 
-We have documented **45+ Senior SDET interview questions** and detailed answers based on this exact framework. It covers everything from **Appium Architecture** to **Advanced Observability**.
-
----
 
 ## 📈 Recent Major Updates
 
