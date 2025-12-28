@@ -148,6 +148,24 @@ Generate and open the interactive Allure report:
 ```bash
 ./gradlew allureServe
 ```
+
+---
+
+## 🐳 Dockerized Execution (Advanced)
+
+For a completely isolated execution environment, you can run the entire infrastructure via Docker.
+
+### **How it works:**
+The `docker-compose.yml` spins up two containers:
+1.  **`android-device`**: A specialized container (Budtmo) that hosts a Virtual Android Device and an Appium server.
+2.  **`mobile-tests`**: Your framework container that connects to the emulator and runs the tests.
+
+### **Run with Docker:**
+```bash
+# Start the infrastructure
+docker-compose up --build
+```
+*Note: This requires a machine with KVM/Hardware Acceleration enabled.*
 *Note: Once open, you can watch the test execution videos in the "Tear down" section of each test.*
 
 ---

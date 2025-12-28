@@ -13,27 +13,33 @@ permissions:
 jobs:
   mobile-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Java 17
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # 3️⃣ Setup Node.js, Appium & FFmpeg
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
-      - name: Install Appium & Drivers
+      - name: Install Appium & FFmpeg
         run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
           npm install -g appium
           appium driver install uiautomator2
 
+      # 4️⃣ Run Android Tests on Emulator
       - name: Run Android Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -41,21 +47,26 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
+          disable-animations: true # 🚀 Critical: Speeds up tests significantly
           script: |
             # Start Appium in background
             appium --log-level debug &
             
-            # Wait for Appium to be ready (Dynamic check)
+            # Wait for Appium to be ready
             echo "Waiting for Appium to start..."
             timeout 60s bash -c 'until curl -s http://localhost:4723/status; do sleep 2; done'
             echo "Appium is UP and running!"
             
+            # Grant execute permission and run tests
+            chmod +x gradlew
             ./gradlew clean test -Dplatform=android
 
+      # 5️⃣ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: ./gradlew allureReport
 
+      # 6️⃣ Upload Allure Report (HTML) - Artifact
       - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,9 +74,33 @@ jobs:
           name: allure-report
           path: build/reports/allure-report/allureReport
 
+      # 7️⃣ Upload Allure Results (Raw Data) - Artifact
+      - name: Upload Allure Results (Raw)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: build/allure-results
+
+      # 8️⃣ Deploy Allure to GitHub Pages
       - name: Deploy Allure to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/reports/allure-report/allureReport
+          publish_branch: gh-pages
+
+      # 9️⃣ Report Link Output
+      - name: Report Link
+        if: always()
+        run: echo "Allure Report is available at https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+
+      # 🔟 Send Telegram Notification
+      - name: Send Telegram Notification
+        if: always()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode=Markdown \
+            -d text="*Mobile Build Finished!* %0A*Repo*: ${{ github.repository }} %0A*Status*: ${{ job.status }} %0A*Report*: [View Allure Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)"

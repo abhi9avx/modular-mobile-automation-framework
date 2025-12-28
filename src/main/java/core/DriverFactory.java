@@ -62,6 +62,16 @@ public class DriverFactory {
             java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("appWaitDuration"))));
       }
 
+      // Add specialized timeouts for CI stability
+      if (ConfigProvider.get("adbExecTimeout") != null) {
+        options.setAdbExecTimeout(
+            java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("adbExecTimeout"))));
+      }
+      if (ConfigProvider.get("androidInstallTimeout") != null) {
+        options.setAndroidInstallTimeout(
+            java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("androidInstallTimeout"))));
+      }
+
       // Step 3: Convert app path to absolute path
       String appPath = Paths.get(ConfigProvider.get("app")).toAbsolutePath().toString();
 
@@ -90,6 +100,12 @@ public class DriverFactory {
 
       if (ConfigProvider.get("bundleId") != null) {
         options.setBundleId(ConfigProvider.get("bundleId"));
+      }
+
+      // Add specialized timeouts for iOS CI stability
+      if (ConfigProvider.get("wdaLaunchTimeout") != null) {
+        options.setWdaLaunchTimeout(
+            java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("wdaLaunchTimeout"))));
       }
 
       // Convert app path to absolute path

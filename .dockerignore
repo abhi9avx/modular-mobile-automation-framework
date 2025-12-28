@@ -1,0 +1,15 @@
+build/
+.gradle/
+.allure/
+allure-results/
+bin/
+out/
+.idea/
+.vscode/
+.git/
+*.log
+Dockerfile
+docker-compose.yml
+.github/
+README.md
+INTERVIEW_QA.md

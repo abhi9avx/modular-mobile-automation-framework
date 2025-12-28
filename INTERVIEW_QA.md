@@ -382,3 +382,28 @@ I use the `peaceiris/actions-gh-pages` action. Once the `allureReport` task gene
 ### 50. What is "Self-Healing" in the context of Page Objects?
 **Answer:**
 Self-healing is an advanced concept where if a locator fails, the framework tries alternative locators (e.g., if ID fails, try XPath). In our framework, we have a "Semi-Self-Healing" approach in `AndroidProductsPage` where we use a `try-catch` to attempt an accessibility ID first, and if that fails, we fallback to a more robust XPath.
+
+---
+
+## 🏗️ Premium Infrastructure & Orchestration
+
+### 51. Why is a `.dockerignore` file important in your framework?
+**Answer:**
+A `.dockerignore` file is similar to a `.gitignore`. It prevents unnecessary files like `build/`, `.gradle/`, and IDE folders (`.vscode/`) from being copied into the Docker image. 
+*   **Faster Builds**: Smaller context means the image builds much faster.
+*   **Security**: Prevents secrets or local logs from being baked into the image.
+*   **Reliability**: Ensures the container starts with a clean state, avoiding local "dirty" build artifacts.
+
+### 52. How did you implement real-time team notifications in CI?
+**Answer:**
+I integrated **Telegram Notifications** into the GitHub Actions workflow. Using the `curl` command, I send a POST request to the Telegram Bot API at the end of every run. It includes:
+*   **Build Status**: Passing the `${{ job.status }}` variable.
+*   **Direct Links**: A clickable Markdown link to the Allure Report hosted on GitHub Pages.
+This ensures the engineering team gets instant feedback on their mobile app stability without checking GitHub.
+
+### 53. Explain your `docker-compose` multi-service architecture.
+**Answer:**
+For mobile automation, a single container isn't enough because you need an emulator. I designed a dual-container architecture:
+1.  **Android Container**: Runs a pre-configured Android emulator and Appium server.
+2.  **Test Container**: Runs our Java project code.
+They are connected via a virtual **Docker Network**. By mapping the `allure-results` as a **Volume**, we ensure that test results are persisted on the host machine even after the short-lived test container finishes execution.
