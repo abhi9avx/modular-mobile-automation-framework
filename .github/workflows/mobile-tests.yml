@@ -80,9 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: build/reports/allure-report/allureReport
-
-      # 7️⃣ Upload Allure Results (Raw Data) - Artifact
+      # 5️⃣ Upload Allure Results (Raw Data) - Artifact
       - name: Upload Allure Results (Raw)
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,25 +88,33 @@ jobs:
           name: allure-results
           path: build/allure-results
 
-      # 8️⃣ Deploy Allure to GitHub Pages
-      - name: Deploy Allure to GitHub Pages
+      # 6️⃣ Generate Allure Report
+      - name: Run ./gradlew allureReport
+        if: always()
+        run: ./gradlew allureReport
+
+      # 7️⃣ Deploy Allure Report to GitHub Pages
+      - name: Deploy Allure Report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/reports/allure-report/allureReport
-          publish_branch: gh-pages
+          publish_dir: build/reports/allure-report # 🚀 Cleaned up path
+          force_orphan: true
 
-      # 9️⃣ Report Link Output
-      - name: Report Link
-        if: always()
-        run: echo "Allure Report is available at https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-
-      # 🔟 Send Telegram Notification
+      # 8️⃣ Send Telegram Notification
       - name: Send Telegram Notification
         if: always()
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          URL="https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          TEXT="🚀 *Mobile Test Execution Completed!*
+          
+          ✅ *Result:* ${{ job.status }}
+          🌍 *Report:* [Click here to view](https://abhi9avx.github.io/modular-mobile-automation-framework/)
+          
+          🛠 *Platform:* Android (API 28)"
+          
+          curl -s -X POST "$URL" \
             -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-            -d parse_mode=Markdown \
-            -d text="*Mobile Build Finished!* %0A*Repo*: ${{ github.repository }} %0A*Status*: ${{ job.status }} %0A*Report*: [View Allure Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)"
+            -d text="$TEXT" \
+            -d parse_mode="Markdown"

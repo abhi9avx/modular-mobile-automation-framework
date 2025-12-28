@@ -1,5 +1,6 @@
 package pages.common;
 
+import core.ConfigProvider;
 import io.appium.java_client.AppiumDriver;
 import java.time.Duration;
 import org.openqa.selenium.By;
@@ -15,7 +16,7 @@ public class BasePage {
   // Constructor: gets driver from child pages
   public BasePage(AppiumDriver driver) {
     this.driver = driver;
-    int timeout = Integer.parseInt(core.ConfigProvider.get("defaultWait", "10"));
+    int timeout = Integer.parseInt(ConfigProvider.get("defaultWait", "10"));
     this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
   }
 
