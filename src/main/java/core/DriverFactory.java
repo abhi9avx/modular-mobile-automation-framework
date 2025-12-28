@@ -87,6 +87,13 @@ public class DriverFactory {
         options.setFullReset(Boolean.parseBoolean(ConfigProvider.get("fullReset")));
       }
 
+      if (ConfigProvider.get("autoGrantPermissions") != null) {
+        options.setAutoGrantPermissions(Boolean.parseBoolean(ConfigProvider.get("autoGrantPermissions")));
+      }
+      // Ensure app foregrounds even if already running
+      options.setCapability("appium:forceAppLaunch", true);
+      options.setCapability("appium:eventLoopIdleDelay", 1000);
+
       // Step 3: Convert app path to absolute path
       String appPath = Paths.get(ConfigProvider.get("app")).toAbsolutePath().toString();
 

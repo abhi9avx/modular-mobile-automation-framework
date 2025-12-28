@@ -38,6 +38,10 @@ public class ConfigProvider {
   }
 
   public static String get(String key) {
+    return get(key, null);
+  }
+
+  public static String get(String key, String defaultValue) {
     String platform = System.getProperty("platform");
     if (platform == null || platform.trim().isEmpty()) {
       platform = "android";
@@ -47,7 +51,7 @@ public class ConfigProvider {
     if (config == null || !currentPlatform.equals(loadedPlatform)) {
       loadConfig();
     }
-    return config.getProperty(key);
+    return config.getProperty(key, defaultValue);
   }
 }
 

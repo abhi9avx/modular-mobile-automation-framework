@@ -15,7 +15,8 @@ public class BasePage {
   // Constructor: gets driver from child pages
   public BasePage(AppiumDriver driver) {
     this.driver = driver;
-    this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    int timeout = Integer.parseInt(core.ConfigProvider.get("defaultWait", "10"));
+    this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
   }
 
   // Wait until element is visible
