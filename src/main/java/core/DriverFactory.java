@@ -71,6 +71,21 @@ public class DriverFactory {
         options.setAndroidInstallTimeout(
             java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("androidInstallTimeout"))));
       }
+      if (ConfigProvider.get("uiautomator2ServerInstallTimeout") != null) {
+        options.setUiautomator2ServerInstallTimeout(
+            java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("uiautomator2ServerInstallTimeout"))));
+      }
+      if (ConfigProvider.get("uiautomator2ServerLaunchTimeout") != null) {
+        options.setUiautomator2ServerLaunchTimeout(
+            java.time.Duration.ofMillis(Long.parseLong(ConfigProvider.get("uiautomator2ServerLaunchTimeout"))));
+      }
+
+      if (ConfigProvider.get("noReset") != null) {
+        options.setNoReset(Boolean.parseBoolean(ConfigProvider.get("noReset")));
+      }
+      if (ConfigProvider.get("fullReset") != null) {
+        options.setFullReset(Boolean.parseBoolean(ConfigProvider.get("fullReset")));
+      }
 
       // Step 3: Convert app path to absolute path
       String appPath = Paths.get(ConfigProvider.get("app")).toAbsolutePath().toString();

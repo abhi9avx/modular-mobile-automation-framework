@@ -27,6 +27,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # 🚨 CRITICAL: Fix KVM permissions for hardware acceleration
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       # 3️⃣ Setup Node.js, Appium & FFmpeg
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -43,11 +50,12 @@ jobs:
       - name: Run Android Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 28 # 🚀 Sweet spot for CI stability
           target: google_apis
           arch: x86_64
           profile: pixel_6
-          disable-animations: true # 🚀 Critical: Speeds up tests significantly
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             # Start Appium in background
             appium --log-level debug &
