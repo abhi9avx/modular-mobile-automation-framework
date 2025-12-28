@@ -407,3 +407,28 @@ For mobile automation, a single container isn't enough because you need an emula
 1.  **Android Container**: Runs a pre-configured Android emulator and Appium server.
 2.  **Test Container**: Runs our Java project code.
 They are connected via a virtual **Docker Network**. By mapping the `allure-results` as a **Volume**, we ensure that test results are persisted on the host machine even after the short-lived test container finishes execution.
+
+### 54. How do you handle secrets for external integrations (like Telegram) in CI?
+**Answer:**
+I use **GitHub Repository Secrets**. Sensitive data like `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are never committed to the code. Instead:
+1.  They are stored in the GitHub repository settings.
+2.  In the workflow YAML, they are mapped to **Environment Variables** for the specific step.
+3.  I also implemented **Defensive Scripting**: The notification step checks if these variables are empty. If they are, it logs a warning and skips the notification rather than failing the entire build.
+
+### 55. What is the difference between `pkill -f` and `pkill -x` in your CI cleanup?
+**Answer:**
+*   **`pkill -f`**: Matches the pattern against the **full command line** (e.g., it might kill the shell script that is *running* the Appium killer).
+*   **`pkill -x`**: Matches the pattern against the **exact process name**. 
+In CI, I switched to `-x` or refined the logic to prevent "Suicide" (the script killing itself), which previously caused the runner to report an `exit code null`.
+
+### 56. Explain the "Docker-Ready" configuration logic you implemented in `ConfigProvider`.
+**Answer:**
+I implemented a **Hierarchical Configuration Strategy**. The `get()` method checks values in this order:
+1.  **System Properties** (`-D` flag): Highest priority for runtime overrides.
+2.  **Environment Variables**: Crucial for Docker, where we pass `appiumServerUrl` via the `docker-compose.yml`.
+3.  **Properties File**: The fallback default.
+This ensures the same code runs locally (using `localhost`) and in Docker (using service names like `http://android-device:4723`) without manual code changes.
+
+### 57. How do you view tests running inside a headless Docker container?
+**Answer:**
+I use a **noVNC (VNC over Web)** integration. The `android-device` container exposes port **6080**. By navigating to `http://localhost:6080` in a browser, I can interact with a virtual desktop that shows the Android emulator screen live as the automation executes. This is vital for debugging "headless" CI/Docker failures.

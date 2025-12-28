@@ -151,35 +151,40 @@ Generate and open the interactive Allure report:
 
 ---
 
-## 🐳 Dockerized Execution (Advanced)
+## 🐳 Dockerized Execution (Premium Infrastructure)
 
-For a completely isolated execution environment, you can run the entire infrastructure via Docker.
+For a professional, isolated execution environment, this framework supports a **Multi-Service Docker Architecture**. Use this to run tests without installing Android SDKs or Emulators on your local host.
 
-### **How it works:**
-The `docker-compose.yml` spins up two containers:
-1.  **`android-device`**: A specialized container (Budtmo) that hosts a Virtual Android Device and an Appium server.
-2.  **`mobile-tests`**: Your framework container that connects to the emulator and runs the tests.
+### **1. How it works**
+The `docker-compose.yml` orchestrates two linked services:
+1.  **`android-device`**: A container running an Android Emulator and an Appium server.
+2.  **`mobile-tests`**: Your test engine container that connects to the emulator via the internal Docker network.
 
-### **Run with Docker:**
-```bash
-# Start the infrastructure
-docker-compose up --build
-```
-*Note: This requires a machine with KVM/Hardware Acceleration enabled.*
-*Note: Once open, you can watch the test execution videos in the "Tear down" section of each test.*
+### **2. Watch Live in Browser (Stunning Feature)**
+One of the most powerful features of this setup is the **integrated VNC Viewer**.
+1.  Run the infrastructure: `docker-compose up --build`
+2.  Open your browser to: **`http://localhost:6080`**
+3.  **WOW Factor**: You can watch the Android device screen and interact with it live directly in your web browser!
+
+### **3. Persistence**
+All results, videos, and logs are mapped from the container back to your local `build/` folder using **Docker Volumes**, ensuring data is not lost when containers shut down.
 
 ---
 
-## 🤖 CI/CD Integration (GitHub Actions)
+## 🤖 CI/CD Evolution (GitHub Actions)
 
-The framework is fully integrated with **GitHub Actions** for Continuous Integration.
+This framework isn't just code—it's a production-ready **CI/CD Pipeline**.
 
 ### **Pipeline Workflow (`mobile-tests.yml`):**
-1.  **Environment Setup**: Installs Java 17, Node.js, and Appium 2.x.
-2.  **Appium Infrastructure**: Automatically installs the `uiautomator2` driver and starts the server.
-3.  **Android Emulator Runner**: Uses hardware-accelerated cloud emulators to run tests without requiring local devices.
-4.  **Resilient Execution**: Uses `if: always()` logic to ensure that an **Allure Report** is always generated and uploaded, even if tests fail.
-5.  **GitHub Pages Deployment**: Automatically hosts the latest report so the whole team can view test results via a URL.
+*   **Infrastructure-as-Code**: Automatically sets up Java, Node.js, Appium, and Android Emulators using hardware acceleration (KVM).
+*   **Robust Lifecycle**: Uses optimized cleanup logic (`pkill -x appium`) to ensure the server starts and stops cleanly every time.
+*   **GitHub Pages Deployment**: Every successful or failed run triggers an automatic deployment of the Allure Report to GitHub Pages.
+*   **🚀 Real-time Telegram Notifications**: The framework sends an instant message to your team on Telegram as soon as tests finish, including:
+    *   **Build Status** (Success/Failure)
+    *   **Clickable Report Link** for instant troubleshooting.
+
+### **Security First**
+All sensitive data (Telegram Tokens, Chat IDs) are managed via **GitHub Repository Secrets** and mapped to the environment at runtime, ensuring complete security.
 
 ---
 
