@@ -44,6 +44,12 @@ spotless {
 
 test {
     useTestNG()
+    
+    // Automatically clear old Allure results before every test run
+    doFirst {
+        delete fileTree("build/allure-results")
+    }
+
     // pass specific system properties to the test runner
     systemProperty "platform", System.getProperty("platform")
 

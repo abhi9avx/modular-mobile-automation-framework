@@ -9,33 +9,41 @@ public class ConfigProvider {
   private static String loadedPlatform;
 
   private static void loadConfig() {
+    String platform = System.getProperty("platform");
+
+    // Default to android if platform is null or empty
+    if (platform == null || platform.trim().isEmpty()) {
+      platform = "android";
+    }
+    platform = platform.toLowerCase();
+
+    String fileName = "config/" + platform + ".properties";
+    System.out.println("DEBUG: Loading configuration for Platform: [" + platform + "] from file: [" + fileName + "]");
+
     try {
-      // 1. Get the platform checking command line arguments (default to "android")
-      String platform = System.getProperty("platform", "android").toLowerCase();
-      System.out.println("Loading configuration for Platform: " + platform);
-
-      // 2. Define which file to load
-      String fileName = "config/" + platform + ".properties";
-
-      // 3. Load the file from the resources folder
       InputStream fileInput = ConfigProvider.class.getClassLoader().getResourceAsStream(fileName);
 
       if (fileInput == null) {
-        throw new RuntimeException("Config file not found: " + fileName);
+        throw new RuntimeException("Config file not found in classpath: " + fileName);
       }
 
-      // 4. Save properties so we can use them
       config = new Properties();
       config.load(fileInput);
       loadedPlatform = platform;
 
     } catch (Exception e) {
-      throw new RuntimeException("Failed to load configuration", e);
+      throw new RuntimeException("Failed to load configuration for file: " + fileName + ". Error: " + e.getMessage(),
+          e);
     }
   }
 
   public static String get(String key) {
-    String currentPlatform = System.getProperty("platform", "android").toLowerCase();
+    String platform = System.getProperty("platform");
+    if (platform == null || platform.trim().isEmpty()) {
+      platform = "android";
+    }
+    String currentPlatform = platform.toLowerCase();
+
     if (config == null || !currentPlatform.equals(loadedPlatform)) {
       loadConfig();
     }
