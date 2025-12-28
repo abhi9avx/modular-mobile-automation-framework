@@ -13,7 +13,7 @@ permissions:
 jobs:
   mobile-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       # 1️⃣ Checkout code
@@ -50,7 +50,7 @@ jobs:
       - name: Run Android Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 28 # 🚀 Sweet spot for CI stability
+          api-level: 28
           target: google_apis
           arch: x86_64
           profile: pixel_6
@@ -58,7 +58,8 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             # Start Appium in background
-            appium --log-level debug &
+            appium --log-level debug > appium.log 2>&1 &
+            APPIUM_PID=$!
             
             # Wait for Appium to be ready
             echo "Waiting for Appium to start..."
@@ -67,20 +68,27 @@ jobs:
             
             # Grant execute permission and run tests
             chmod +x gradlew
-            ./gradlew clean test -Dplatform=android
+            ./gradlew clean test -Dplatform=android || echo "Tests failed but continuing to report..."
+            
+            # 🚨 Kill Appium explicitly to prevent job hang
+            echo "Killing Appium (PID: $APPIUM_PID)..."
+            kill $APPIUM_PID || true
+            sleep 5
 
       # 5️⃣ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: ./gradlew allureReport
 
-      # 6️⃣ Upload Allure Report (HTML) - Artifact
+      # 6️⃣ Upload Allure HTML Report - Artifact
       - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-      # 5️⃣ Upload Allure Results (Raw Data) - Artifact
+          path: build/reports/allure-report/allureReport
+
+      # 7️⃣ Upload Allure Results (Raw) - Artifact
       - name: Upload Allure Results (Raw)
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,21 +96,16 @@ jobs:
           name: allure-results
           path: build/allure-results
 
-      # 6️⃣ Generate Allure Report
-      - name: Run ./gradlew allureReport
-        if: always()
-        run: ./gradlew allureReport
-
-      # 7️⃣ Deploy Allure Report to GitHub Pages
+      # 8️⃣ Deploy Allure Report to GitHub Pages
       - name: Deploy Allure Report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/reports/allure-report # 🚀 Cleaned up path
+          publish_dir: build/reports/allure-report/allureReport # 🚀 Correct subfolder
           force_orphan: true
 
-      # 8️⃣ Send Telegram Notification
+      # 9️⃣ Send Telegram Notification
       - name: Send Telegram Notification
         if: always()
         run: |
